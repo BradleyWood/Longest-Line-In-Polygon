@@ -39,12 +39,12 @@ public class Island extends Polygon {
      * @return True if the line is inside the polygon
      */
     public boolean containsLine(int a, int b) {
+        if (a == b || a > npoints || b > npoints || a < 0 || b < 0) {
+            throw new IllegalArgumentException("Invalid line segment");
+        }
         // check if the vertices are in direct sequence
         if (Math.abs(a - b) == 1 || Math.abs(a - b) == npoints - 1) {
             return true;
-        }
-        if (a == b || a > npoints || b > npoints) {
-            throw new IllegalArgumentException("Invalid line segment");
         }
         Point2D pA = new Point2D.Double(xpoints[a], ypoints[a]);
         Point2D pB = new Point2D.Double(xpoints[b], ypoints[b]);

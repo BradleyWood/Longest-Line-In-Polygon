@@ -42,6 +42,8 @@ public class Application {
                 } else {
                     System.out.println("The polygon is invalid: No two vertices can form a valid runway");
                 }
+            } else {
+                System.out.println("Invalid file format.");
             }
         } catch (IOException e) {
             System.out.println("Failed to read file. " + path);
@@ -66,6 +68,8 @@ public class Application {
         int i = 0;
 
         while (sc.hasNext()) {
+            if(i / 2 >= numVertices)
+                return null;
             if (i % 2 == 0) {
                 xpoints[i / 2] = sc.nextInt();
             } else {

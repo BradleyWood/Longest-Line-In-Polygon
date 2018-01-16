@@ -45,7 +45,7 @@ At this point, if the line hasn't been invalidated, we establish that it is vali
 
 <p>
 This algorithm is has an average time complexity of n^3 and a worst case time complexity
-of n^3 log n. The space case space complexity is n.
+of n^3 log n. The worst case space complexity is n.
 </p>
 
 ### Running times
@@ -69,11 +69,11 @@ of n^3 log n. The space case space complexity is n.
 ## Results
 
 ![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data3.png?raw=true) <br> <br>
-![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data5.png?raw=true) <br> <br>
+![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data5.png?raw=true)
 ![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data9.png?raw=true) <br> <br>
-![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data11.png?raw=true) <br> <br>
+![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data11.png?raw=true)
 ![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data17.png?raw=true) <br> <br>
-![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data56.png?raw=true) <br> <br>
+![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data56.png?raw=true)
 ![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data113.png?raw=true) <br> <br>
-![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data148.png?raw=true) <br> <br>
+![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data148.png?raw=true)
 ![Alt Text](https://github.com/BradleyWood/Island-Airport-Calculator/blob/master/results/data500.png?raw=true) <br> <br>

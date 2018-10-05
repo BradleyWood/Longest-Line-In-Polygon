@@ -4,8 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Application {
 
@@ -16,10 +15,13 @@ public class Application {
             System.out.println("Error: You must provide an input polygon file.");
             return;
         }
-        String path = args[0];
+
+        final String path = args[0];
+
         if (args.length >= 2) {
             output = args[1];
         }
+
         try {
             Island poly = loadPoly(path);
             if (poly != null) {
@@ -47,40 +49,34 @@ public class Application {
         } catch (IOException e) {
             System.out.println("Failed to read file. " + path);
             e.printStackTrace();
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid file format.");
         }
     }
 
     private static Island loadPoly(final String file) throws IOException {
-        Scanner sc = new Scanner(new FileInputStream(file));
+        final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
-        int numVertices = sc.nextInt();
+        final List<Integer> xPoints = new ArrayList<>();
+        final List<Integer> yPoints = new ArrayList<>();
 
-        if (numVertices < 3) {
-            System.out.println("Polygon needs 3 or more points!");
-            return null;
-        }
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (line.trim().isEmpty())
+                continue;
 
-        int[] xpoints = new int[numVertices];
-        int[] ypoints = new int[numVertices];
-        int i = 0;
+            final String[] numbers = line.split(" ");
 
-        while (sc.hasNext()) {
-            if(i / 2 >= numVertices)
+            if (numbers.length != 2)
                 return null;
-            if (i % 2 == 0) {
-                xpoints[i / 2] = sc.nextInt();
-            } else {
-                ypoints[i / 2] = sc.nextInt();
+
+            try {
+                xPoints.add(Integer.parseInt(numbers[0]));
+                yPoints.add(Integer.parseInt(numbers[1]));
+            } catch (NumberFormatException e) {
+                return null;
             }
-            i++;
         }
 
-        if (numVertices != i / 2) {
-            System.out.println("Expected " + numVertices + " vertices but found " + i / 2);
-            return null;
-        }
-        return new Island(xpoints, ypoints, numVertices);
+        return new Island(xPoints.stream().mapToInt(n -> n).toArray(),
+                yPoints.stream().mapToInt(n -> n).toArray(), xPoints.size());
     }
 }

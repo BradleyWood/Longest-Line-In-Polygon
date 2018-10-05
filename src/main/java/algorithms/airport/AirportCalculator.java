@@ -20,9 +20,8 @@ public class AirportCalculator {
      * @return The runway as a line segment
      */
     public Line2D calculate() {
-        double runway = Double.NEGATIVE_INFINITY;
-        Point2D maxA = null;
-        Point2D maxB = null;
+        double runwayLength = Double.NEGATIVE_INFINITY;
+        Line2D runwayLine = null;
 
         // n choose 2 segments to test
         // If we check pt 1 and pt 4, we will never check pt 4 with pt 1
@@ -30,23 +29,29 @@ public class AirportCalculator {
         for (int a = 0; a < poly.npoints; a++) {
             for (int b = a + 1; b < poly.npoints; b++) {
                 if (poly.containsLine(a, b)) {
-                    Point2D pa = extend(new Point2D.Double(poly.xpoints[a], poly.ypoints[a]), new Point2D.Double(poly.xpoints[b], poly.ypoints[b]), true);
-                    Point2D pb = extend(new Point2D.Double(poly.xpoints[a], poly.ypoints[a]), new Point2D.Double(poly.xpoints[b], poly.ypoints[b]), false);
+                    Point2D start = new Point2D.Double(poly.xpoints[a], poly.ypoints[a]);
+                    Point2D end = new Point2D.Double(poly.xpoints[b], poly.ypoints[b]);
+
+                    start = extend(start, end, true);
+                    end = extend(start, end, false);
+
                     // once we know a line is valid we must attempt to extend it
                     // since the longest line may not end on a vertex
-                    double dist = pa.distance(pb);
-                    if (dist >= runway) {
-                        runway = dist;
-                        maxA = pa;
-                        maxB = pb;
+
+                    final double dist = start.distance(end);
+
+                    if (dist >= runwayLength) {
+                        runwayLength = dist;
+                        runwayLine = new Line2D.Double(start, end);
                     }
                 }
             }
         }
-        if (maxA != null) {
-            return new Line2D.Double(maxA.getX(), maxA.getY(), maxB.getX(), maxB.getY());
-        }
-        return null;
+
+        if (runwayLine == null)
+            return null;
+
+        return runwayLine;
     }
 
     /**
@@ -59,30 +64,35 @@ public class AirportCalculator {
      * @param extendA Whether to extend the line from point a or b
      * @return The pt to which the line has been extended to
      */
-    private Point2D extend(Point2D a, Point2D b, boolean extendA) {
+    private Point2D extend(final Point2D a, final Point2D b, final boolean extendA) {
         // this is arbitrary but guaranteed to extend outside the polygon
-        double extensionAmount = poly.getBounds().getWidth() * poly.getBounds().getHeight();
+        final double extensionAmount = poly.getBounds().getWidth() * poly.getBounds().getHeight();
         double nx, ny;
+
         if (extendA) {
-            double angle = angleBetween(b, a);
+            final double angle = angleBetween(b, a);
             nx = a.getX() + extensionAmount * Math.cos(Math.toRadians(angle));
             ny = a.getY() + extensionAmount * Math.sin(Math.toRadians(angle));
         } else {
-            double angle = angleBetween(a, b);
+            final double angle = angleBetween(a, b);
             nx = b.getX() + extensionAmount * Math.cos(Math.toRadians(angle));
             ny = b.getY() + extensionAmount * Math.sin(Math.toRadians(angle));
         }
-        Point2D np = getClosestIntersection(new Point2D.Double(nx, ny), extendA ? a : b);
+
+        final Point2D np = getClosestIntersection(new Point2D.Double(nx, ny), extendA ? a : b);
 
         if (np != null) {
             double m1 = ((extendA ? a.getX() : b.getX()) + np.getX()) / 2;
             double m2 = ((extendA ? a.getY() : b.getY()) + np.getY()) / 2;
+
             // make sure the new point is also inside the polygon
             if(!poly.contains(m1 , m2)) {
                 return extendA ? a : b;
             }
+
             return np;
         }
+
         // no intersection, return the original point
         return extendA ? a : b;
     }
@@ -95,16 +105,19 @@ public class AirportCalculator {
      * @param b The second line in the segment and the point which to find the closest intersection to
      * @return The closest intersection point
      */
-    private Point2D getClosestIntersection(Point2D a, Point2D b) {
+    private Point2D getClosestIntersection(final Point2D a, final Point2D b) {
+        final List<Point2D> intersections = poly.getIntersections(a, b);
+
         double dist = Double.POSITIVE_INFINITY;
         Point2D result = null;
-        List<Point2D> intersections = poly.getIntersections(a, b);
-        for (Point2D intersection : intersections) {
+
+        for (final Point2D intersection : intersections) {
             if (intersection.distance(b) < dist && dist > 0.0000001) {
                 result = intersection;
                 dist = intersection.distance(b);
             }
         }
+
         return result;
     }
 }

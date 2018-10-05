@@ -1,5 +1,6 @@
 package algorithms.airport;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 
 public class Utility {
@@ -15,7 +16,6 @@ public class Utility {
     public static double angleBetween(final Point2D src, final Point2D dest) {
         return angleBetween(src.getX(), src.getY(), dest.getX(), dest.getY());
     }
-
 
     /**
      * Calculates the angle from the src point to the destination point in degrees
@@ -37,36 +37,12 @@ public class Utility {
         return Math.toDegrees(inRads);
     }
 
+    public static boolean isPointOnLine(final Line2D line, final Point2D pt) {
+        final double lineLength = line.getP1().distance(line.getP2());
+        final double sumOfPtDistance = line.getP1().distance(pt) + line.getP2().distance(pt);
 
-    /**
-     * The 2d distance between two points
-     *
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @return
-     */
-    public static double distanceBetween(final double x1, final double y1, final double x2, final double y2) {
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-    }
+        final double epsilon = 0.00000000001;
 
-    /**
-     * Tests whether a point is on a line. This is used to help check whether a line
-     * ends on another line
-     *
-     * @param px1 The x co-ordinate of the point to test
-     * @param py1 The y co-ordinate of the point to test
-     * @param x2  first x line co-ordinate
-     * @param y2  first y line co-ordinate
-     * @param x3  second x line co-ordinate
-     * @param y3  second y line co-ordinate
-     * @return
-     */
-    public static boolean onLine(final double px1, final double py1, final double x2, final double y2, final double x3, final double y3) {
-        double d23 = distanceBetween(x2, y2, x3, y3);
-        double d1 = distanceBetween(px1, py1, x3, y3) + distanceBetween(px1, py1, x2, y2);
-        double eps = 0.00000000001;
-        return d1 + eps > d23 && d1 - eps < d23;
+        return sumOfPtDistance + epsilon > lineLength && sumOfPtDistance - epsilon < lineLength;
     }
 }

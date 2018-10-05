@@ -1,6 +1,5 @@
 package algorithms.airport;
 
-
 import javax.imageio.ImageIO;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -33,7 +32,7 @@ public class Application {
                 System.out.println("Calculated in " + (System.currentTimeMillis() - startTime) + " ms.");
 
                 if (runway != null) {
-                    System.out.println("Runway length: " + Utility.distanceBetween(runway.getX1(), runway.getY1(), runway.getX2(), runway.getY2()));
+                    System.out.println("Runway length: " + runway.getP1().distance(runway.getP2()));
                     System.out.println("(" + runway.getX1() + "," + runway.getY1() + ") to (" + runway.getX2() + "," + runway.getY2() + ")");
 
                     Renderer renderer = new Renderer(poly, runway);

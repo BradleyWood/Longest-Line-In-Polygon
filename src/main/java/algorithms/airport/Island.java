@@ -5,7 +5,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.*;
 
-import static algorithms.airport.Utility.onLine;
+import static algorithms.airport.Utility.isPointOnLine;
 
 
 public class Island extends Polygon {
@@ -31,6 +31,16 @@ public class Island extends Polygon {
         return npoints;
     }
 
+    private Line2D getLineFromIndices(final int a, final int b) {
+        if (a == b || a > npoints || b > npoints || a < 0 || b < 0)
+            throw new IllegalArgumentException("Invalid line segment");
+
+        final Point2D.Double ptA = new Point2D.Double(xpoints[a], ypoints[a]);
+        final Point2D.Double ptB = new Point2D.Double(xpoints[b], ypoints[b]);
+
+        return new Line2D.Double(ptA, ptB);
+    }
+
     /**
      * Tests where a line between two vertices is fully contained by the island
      *
@@ -42,28 +52,30 @@ public class Island extends Polygon {
         if (a == b || a > npoints || b > npoints || a < 0 || b < 0) {
             throw new IllegalArgumentException("Invalid line segment");
         }
+
         // check if the vertices are in direct sequence
         if (Math.abs(a - b) == 1 || Math.abs(a - b) == npoints - 1) {
             return true;
         }
-        Point2D pA = new Point2D.Double(xpoints[a], ypoints[a]);
-        Point2D pB = new Point2D.Double(xpoints[b], ypoints[b]);
+
+        final Point2D pA = new Point2D.Double(xpoints[a], ypoints[a]);
+        final Point2D pB = new Point2D.Double(xpoints[b], ypoints[b]);
 
         // If the line segment crosses ANY edge it is invalid.
         for (int i = 0; i < npoints - 1; i++) {
             if (a == i || a == a + 1 || b == i || b == i + 1)
                 continue; // dont check if the line segment crosses itself
-            if (doEdgesCross(xpoints[a], ypoints[a], xpoints[b], ypoints[b], xpoints[i], ypoints[i], xpoints[i + 1], ypoints[i + 1])) {
+
+            if (doLinesCross(getLineFromIndices(a, b), getLineFromIndices(i, i + 1)))
                 return false;
-            }
         }
-        if (doEdgesCross(xpoints[a], ypoints[a], xpoints[b], ypoints[b], xpoints[npoints - 1], ypoints[npoints - 1], xpoints[0], ypoints[0])) {
 
+        if (doLinesCross(getLineFromIndices(a, b), getLineFromIndices(npoints - 1, 0)))
             return false;
-        }
-        LinkedList<Point2D> intersections = getIntersections(a, b);
 
-        Comparator<Point2D> comp = (o1, o2) -> Double.compare(pA.distance(o2), pA.distance(o1));
+        final LinkedList<Point2D> intersections = getIntersections(a, b);
+
+        final Comparator<Point2D> comp = (o1, o2) -> Double.compare(pA.distance(o2), pA.distance(o1));
         // sort the intersections by distance from a and check whether
         // each midpoint between the intersections is inside the polygon
         // if any midpoint is not inside the polygon, then the line is invalid
@@ -71,7 +83,7 @@ public class Island extends Polygon {
         intersections.addFirst(pA);
         intersections.addLast(pB);
 
-        Iterator<Point2D> it = intersections.iterator();
+        final Iterator<Point2D> it = intersections.iterator();
         Point2D left = it.next();
 
         for (int i = 0; i < intersections.size() - 1; i++) {
@@ -79,14 +91,15 @@ public class Island extends Polygon {
             if (left.equals(right))
                 continue;
 
-            double x = (left.getX() + right.getX()) / 2;
-            double y = (left.getY() + right.getY()) / 2;
+            final double x = (left.getX() + right.getX()) / 2;
+            final double y = (left.getY() + right.getY()) / 2;
 
             if (!contains(x, y)) {
                 return false;
             }
             left = right;
         }
+
         return true;
     }
 
@@ -108,14 +121,16 @@ public class Island extends Polygon {
      * @param b The second point in the line segment
      * @return A list of points where the lines intersect
      */
-    public LinkedList<Point2D> getIntersections(Point2D a, Point2D b) {
-        LinkedList<Point2D> list = new LinkedList<>();
+    public LinkedList<Point2D> getIntersections(final Point2D a, final Point2D b) {
+        final LinkedList<Point2D> list = new LinkedList<>();
+
         for (int i = 0; i < size() - 1; i++) {
             if (xpoints[i] == a.getY() && ypoints[i] == a.getY() || xpoints[i + 1] == a.getX() && ypoints[i + 1] == a.getY()
                     || xpoints[i] == b.getY() && ypoints[i] == b.getY() || xpoints[i + 1] == b.getX() && ypoints[i + 1] == b.getY())
                 continue;
             Line2D.Double edge = new Line2D.Double(xpoints[i], ypoints[i], xpoints[i + 1], ypoints[i + 1]);
             Point2D intersection = getIntersection(new Line2D.Double(a, b), edge);
+
             if (intersection != null)
                 list.add(intersection);
         }
@@ -126,9 +141,11 @@ public class Island extends Polygon {
 
         Line2D.Double edge = new Line2D.Double(xpoints[npoints - 1], ypoints[npoints - 1], xpoints[0], ypoints[0]);
         Point2D intersection = getIntersection(new Line2D.Double(a, b), edge);
+
         if (intersection != null) {
             list.add(intersection);
         }
+
         return list;
     }
 
@@ -159,23 +176,15 @@ public class Island extends Polygon {
         if (x >= minXa && x >= minXb && x <= maxXa && x <= maxXb && y >= minYa && y >= minYb && y <= maxYa && y <= maxYb) {
             return new Point2D.Double(x, y);
         }
+
         return null;
     }
 
-    private boolean doEdgesIntersect(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-        Line2D line = new Line2D.Double(x1, y1, x2, y2);
-        return line.intersectsLine(x3, y3, x4, y4);
-    }
-
-    /**
-     * Tests whether a line fully crosses another line
-     *
-     * @return True if one line crosses the other
-     */
-    private boolean doEdgesCross(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
-        if (!doEdgesIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) {
+    private boolean doLinesCross(final Line2D lineA, final Line2D lineB) {
+        if (!lineA.intersectsLine(lineB))
             return false;
-        }
-        return !onLine(x1, y1, x2, y3, x4, y4) && !onLine(x2, y2, x3, y3, x4, y4) && !onLine(x3, y3, x1, y1, x2, y2) && !onLine(x4, y4, x1, y1, x2, y2);
+
+        return !isPointOnLine(lineA, lineB.getP1()) && !isPointOnLine(lineA, lineB.getP2()) &&
+                !isPointOnLine(lineB, lineA.getP1()) && !isPointOnLine(lineB, lineA.getP2());
     }
 }

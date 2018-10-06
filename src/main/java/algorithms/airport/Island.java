@@ -7,7 +7,6 @@ import java.util.*;
 
 import static algorithms.airport.Utility.isPointOnLine;
 
-
 public class Island extends Polygon {
 
     /**
@@ -44,8 +43,8 @@ public class Island extends Polygon {
     /**
      * Tests where a line between two vertices is fully contained by the island
      *
-     * @param a The first vertex
-     * @param b The second vertex
+     * @param a The index of the first vertex
+     * @param b The index of the second vertex
      * @return True if the line is inside the polygon
      */
     public boolean containsLine(int a, int b) {
@@ -125,8 +124,8 @@ public class Island extends Polygon {
         final LinkedList<Point2D> list = new LinkedList<>();
 
         for (int i = 0; i < size() - 1; i++) {
-            if (xpoints[i] == a.getY() && ypoints[i] == a.getY() || xpoints[i + 1] == a.getX() && ypoints[i + 1] == a.getY()
-                    || xpoints[i] == b.getY() && ypoints[i] == b.getY() || xpoints[i + 1] == b.getX() && ypoints[i + 1] == b.getY())
+            if (xpoints[i] == a.getX() && ypoints[i] == a.getY() || xpoints[i + 1] == a.getX() && ypoints[i + 1] == a.getY()
+                    || xpoints[i] == b.getX() && ypoints[i] == b.getY() || xpoints[i + 1] == b.getX() && ypoints[i + 1] == b.getY())
                 continue;
             Line2D.Double edge = new Line2D.Double(xpoints[i], ypoints[i], xpoints[i + 1], ypoints[i + 1]);
             Point2D intersection = getIntersection(new Line2D.Double(a, b), edge);
@@ -135,8 +134,8 @@ public class Island extends Polygon {
                 list.add(intersection);
         }
 
-        if (xpoints[0] == a.getY() && ypoints[0] == a.getY() || xpoints[npoints - 1] == a.getX() && ypoints[npoints - 1] == a.getY()
-                || xpoints[0] == b.getY() && ypoints[0] == b.getY() || xpoints[npoints - 1] == b.getX() && ypoints[npoints - 1] == b.getY())
+        if (xpoints[0] == a.getX() && ypoints[0] == a.getY() || xpoints[npoints - 1] == a.getX() && ypoints[npoints - 1] == a.getY()
+                || xpoints[0] == b.getX() && ypoints[0] == b.getY() || xpoints[npoints - 1] == b.getX() && ypoints[npoints - 1] == b.getY())
             return list;
 
         Line2D.Double edge = new Line2D.Double(xpoints[npoints - 1], ypoints[npoints - 1], xpoints[0], ypoints[0]);
